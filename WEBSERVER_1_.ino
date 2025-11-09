@@ -532,8 +532,8 @@ void handleSaveHumidity() {
       delay(100);
 
       // Send humidity to Serial and Serial2
-      Serial.println("HUM " + String(humidity));
-      Serial2.println("HUM " + String(humidity));
+      Serial.println(String(humidity));
+      Serial2.println(String(humidity));
 
       // to ensure transmission
       delay(100);
