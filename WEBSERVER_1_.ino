@@ -708,6 +708,10 @@ void setup() {
 
   server.onNotFound(handleNotFound);
 
+  pinMode(4, OUTPUT);
+  pinMode(5, OUTPUT);
+
+
   Serial2.begin(9600, SERIAL_8N1, 16, 17); // RX2=GPIO16, TX2=GPIO17
 
 
