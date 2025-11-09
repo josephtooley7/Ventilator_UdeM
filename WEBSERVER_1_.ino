@@ -525,8 +525,21 @@ void handleSaveHumidity() {
     int humidity = humidityStr.toInt();
 
     if (humidity >= 0 && humidity <= 100) {
+      // Set GPIO4 HIGH
+      digitalWrite(4, HIGH);
+
+      // to ensure transmission
+      delay(100);
+
+      // Send humidity to Serial and Serial2
       Serial.println("HUM " + String(humidity));
       Serial2.println("HUM " + String(humidity));
+
+      // to ensure transmission
+      delay(100);
+
+      // Set GPIO4 LOW
+      digitalWrite(4, LOW);
     } else {
       Serial.println("Invalid humidity value: " + String(humidity));
       Serial2.println("Invalid humidity value: " + String(humidity));
@@ -538,6 +551,7 @@ void handleSaveHumidity() {
 
   server.send(200, "text/plain", "Humidity received");
 }
+
 
 
 
