@@ -242,6 +242,14 @@ const char HTML_CONTENT_CONTROLS[] PROGMEM = R"=====(
 
 <!-- Toggle Switch Component -->
 
+  
+  <div style="width: 100%; text-align: center; padding-top: 40px;">
+        <a href="/humidity.html">
+           <button style="background-color: rgb(2, 113, 249); color: #f6f5f5; font-size: 1cm; border-radius: 10px; padding: 20px 65px;">Humidity</button>
+        
+        </a>
+    </div>  
+
   <div style="width: 100%; text-align: center; padding-top: 40px;">
         <a href="/">
             <button style="
@@ -255,12 +263,6 @@ const char HTML_CONTENT_CONTROLS[] PROGMEM = R"=====(
             ">Back</button>
         </a>
     </div>
-  <div style="width: 100%; text-align: center; padding-top: 40px;">
-        <a href="/humidity.html">
-           <button style="background-color: rgb(2, 113, 249); color: #f6f5f5; font-size: 1cm; border-radius: 10px; padding: 20px 65px;">Humidity</button>
-        
-        </a>
-    </div>  
 
 
 
@@ -320,60 +322,82 @@ const char HTML_CONTENT_LOST[] PROGMEM = R"=====(
 )=====";
 
 // Humidity Page
-const char HTML_CONTENT_HUMIDITY[] PROGMEM = R"=====(
+const char HTML_CONTENT_HUMIDITY[] PROGMEM = R"=====( 
 <!DOCTYPE html>
 <html>
 <head>
-    <title>My first website</title>
+  <title>Humidity Settings</title>
+  <style>
+    .custom-input {
+      font-size: 1.2cm;
+      color: rgb(9, 25, 139);
+      background-color: rgb(200, 200, 200);
+      border: 2px solid #888;
+      border-radius: 10px;
+      padding: 20px;
+      width: 300px;
+    }
+    .custom-input::placeholder {
+      font-size: 1.2cm;
+      color: rgb(60, 60, 60);
+      opacity: 1;
+    }
+  </style>
 </head>
-<body style="background-color: rgb(100, 100, 100); margin: 0;">
+<body style="background-color: rgb(100, 100, 100); margin: 0; width: 100%; text-align: center; padding-top: 50px;">
+  <input type="number" id="humidity" class="custom-input" placeholder="Humidity %" min="0" max="100">
 
-    <div style="width: 100%; text-align: center; padding-top: 50px;">
-        <a href="/404">
-            <button style="
-                background-color: rgb(2, 113, 249);
-                color: #f6f5f5;
-                font-size: 1cm;
-                border-radius: 10px;
-                border-top-color: rgb(16, 124, 255);
-                border-left-color: rgb(16, 124,255);
-                padding: 20px 40px;
-            ">Save Settings</button>
-        </a>
-    </div>
+  <div style="width: 100%; text-align: center; padding-top: 50px;">
+    <button onclick="sendHumidity()" style="
+        background-color: rgb(2, 113, 249);
+        color: #f6f5f5;
+        font-size: 1cm;
+        border-radius: 10px;
+        padding: 20px 40px;
+    ">Save Settings</button>
+  </div>
 
-    <div style="width: 100%; text-align: center; padding-top: 40px;">
-        <a href="/controls.html">
-            <button style="
-                background-color: rgb(2, 113, 249);
-                color: #f6f5f5;
-                font-size: 1cm;
-                border-radius: 10px;
-                border-top-color: rgb(16, 124, 255);
-                border-left-color: rgb(16, 124,255);
-                padding: 20px 100px;
-            ">Back</button>
-        </a>
-    </div>
+  <script>
+  function sendHumidity() {
+    const humidity = parseInt(document.getElementById("humidity").value);
+    if (isNaN(humidity) || humidity < 0 || humidity > 100) {
+      alert("Please enter a humidity value between 0 and 100.");
+      return;
+    }
 
-    <div style="width: 100%; text-align: center; padding-top: 40px;">
-        <a href="/">
-            <button style="
-                background-color: rgb(2, 113, 249);
-                color: #f6f5f5;
-                font-size: 1cm;
-                border-radius: 10px;
-                border-top-color: rgb(16, 124, 255);
-                border-left-color: rgb(16, 124,255);
-                padding: 20px 100px;
-            ">Home</button>
-        </a>
-    </div>
+    fetch("/saveHumidity", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: "humidity=" + encodeURIComponent(humidity)
+    })
+    .then(response => response.text())
+    .then(data => {
+      console.log(data);
+      alert("Humidity sent: " + humidity);
+    })
+    .catch(error => {
+      console.error("Error:", error);
+      alert("Failed to send humidity.");
+    });
+  }
+  </script>
 
+
+  <div style="width: 100%; text-align: center; padding-top: 40px;">
+    <a href="/controls.html">
+      <button style="background-color: rgb(2, 113, 249); color: #f6f5f5; font-size: 1cm; border-radius: 10px; padding: 20px 100px;">Back</button>
+    </a>
+  </div>
+
+  <div style="width: 100%; text-align: center; padding-top: 40px;">
+    <a href="/">
+      <button style="background-color: rgb(2, 113, 249); color: #f6f5f5; font-size: 1cm; border-radius: 10px; padding: 20px 100px;">Home</button>
+    </a>
+  </div>
 </body>
 </html>
-
 )=====";
+
 
 // Save Page
 const char HTML_CONTENT_SAVE[] PROGMEM = R"=====(
@@ -495,6 +519,28 @@ void handleNotFound() {
   server.send(404, "text/html", HTML_CONTENT_404);
 }
 
+void handleSaveHumidity() {
+  if (server.hasArg("humidity")) {
+    String humidityStr = server.arg("humidity");
+    int humidity = humidityStr.toInt();
+
+    if (humidity >= 0 && humidity <= 100) {
+      Serial.println("HUM " + String(humidity));
+      Serial2.println("HUM " + String(humidity));
+    } else {
+      Serial.println("Invalid humidity value: " + String(humidity));
+      Serial2.println("Invalid humidity value: " + String(humidity));
+    }
+  } else {
+    Serial.println("No humidity arg found");
+    Serial2.println("No humidity arg found");
+  }
+
+  server.send(200, "text/plain", "Humidity received");
+}
+
+
+
 void setup() {
   Serial.begin(9600);
   delay(1000);
@@ -520,6 +566,8 @@ void setup() {
   server.on("/lost.html", handleLost);
   server.on("/save.html", handleSave);
   server.on("/humidity.html", handleHumidity);
+  server.on("/saveHumidity", HTTP_POST, handleSaveHumidity);
+
   server.onNotFound(handleNotFound);
 
   Serial2.begin(9600, SERIAL_8N1, 16, 17); // RX2=GPIO16, TX2=GPIO17
