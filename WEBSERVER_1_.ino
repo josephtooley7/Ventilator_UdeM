@@ -1,6 +1,11 @@
 #include <WiFi.h>
 #include <WebServer.h>
 
+
+int lastHumidity = -1;
+int lastPressure = -1;
+
+
 const char WIFI_SSID[] = "BELL667";
 const char WIFI_PASSWORD[] = "your_password_here";
 
@@ -597,8 +602,16 @@ void handleSave() {
 }
 
 void handleHumidity() {
-  server.send(200, "text/html", HTML_CONTENT_HUMIDITY);
+  String html = HTML_CONTENT_HUMIDITY;
+
+  if (lastHumidity >= 0) {
+    html.replace("id=\"humidity\"", "id=\"humidity\" value=\"" + String(lastHumidity) + "\"");
+    html.replace("</script>", "</script><p style='color:white;'>Last saved humidity: " + String(lastHumidity) + "%</p>");
+  }
+
+  server.send(200, "text/html", html);
 }
+
 
 void handleNotFound() {
   server.send(404, "text/html", HTML_CONTENT_404);
@@ -610,6 +623,9 @@ void handleSaveHumidity() {
     int humidity = humidityStr.toInt();
 
     if (humidity >= 0 && humidity <= 100) {
+      
+      lastHumidity = humidity;  // Save last value it
+
       // Set GPIO4 HIGH
       digitalWrite(4, HIGH);
 
@@ -638,8 +654,17 @@ void handleSaveHumidity() {
 }
 
 void handlePressure() {
-  server.send(200, "text/html", HTML_CONTENT_PRESSURE);
+  String html = HTML_CONTENT_PRESSURE;
+
+  if (lastPressure >= 3 && lastPressure <= 40) {
+    html.replace("id=\"pressure\"", "id=\"pressure\" value=\"" + String(lastPressure) + "\"");
+    html.replace("</script>", "</script><p style='color:white;'>Last saved pressure: " + String(lastPressure) + "</p>");
+  }
+
+  server.send(200, "text/html", html);
 }
+
+
 
 
 void handleSavePressure() {
@@ -648,6 +673,8 @@ void handleSavePressure() {
     int pressure = pressureStr.toInt();
 
     if (pressure >= 3 && pressure <= 40) {
+
+      lastPressure = pressure;  // Save it
       // Set GPIO5 HIGH
       digitalWrite(5, HIGH);
 
