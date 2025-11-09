@@ -251,6 +251,13 @@ const char HTML_CONTENT_CONTROLS[] PROGMEM = R"=====(
     </div>  
 
   <div style="width: 100%; text-align: center; padding-top: 40px;">
+        <a href="/pressure.html">
+           <button style="background-color: rgb(2, 113, 249); color: #f6f5f5; font-size: 1cm; border-radius: 10px; padding: 20px 65px;">Pressure</button>
+        
+        </a>
+  </div>  
+
+  <div style="width: 100%; text-align: center; padding-top: 40px;">
         <a href="/">
             <button style="
                 background-color: rgb(2, 113, 249);
@@ -319,6 +326,83 @@ const char HTML_CONTENT_LOST[] PROGMEM = R"=====(
 </body>
 </html>
 
+)=====";
+
+// Pressure Page
+const char HTML_CONTENT_PRESSURE[] PROGMEM = R"=====( 
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Pressure Settings</title>
+  <style>
+    .custom-input {
+      font-size: 1.2cm;
+      color: rgb(9, 25, 139);
+      background-color: rgb(200, 200, 200);
+      border: 2px solid #888;
+      border-radius: 10px;
+      padding: 20px;
+      width: 300px;
+    }
+    .custom-input::placeholder {
+      font-size: 1.2cm;
+      color: rgb(60, 60, 60);
+      opacity: 1;
+    }
+  </style>
+</head>
+<body style="background-color: rgb(100, 100, 100); margin: 0; width: 100%; text-align: center; padding-top: 50px;">
+  <input type="number" id="pressure" class="custom-input" placeholder="Pressure" min="3" max="40">
+
+  <div style="width: 100%; text-align: center; padding-top: 50px;">
+    <button onclick="sendPressure()" style="
+        background-color: rgb(2, 113, 249);
+        color: #f6f5f5;
+        font-size: 1cm;
+        border-radius: 10px;
+        padding: 20px 40px;
+    ">Save Settings</button>
+  </div>
+
+  <script>
+  function sendPressure() {
+    const pressure = parseInt(document.getElementById("pressure").value);
+    if (isNaN(pressure) || pressure < 3 || pressure > 40) {
+      alert("Please enter a pressure value between 3 and 40.");
+      return;
+    }
+
+    fetch("/savePressure", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: "pressure=" + encodeURIComponent(pressure)
+    })
+    .then(response => response.text())
+    .then(data => {
+      console.log(data);
+      alert("Pressure sent: " + pressure);
+    })
+    .catch(error => {
+      console.error("Error:", error);
+      alert("Failed to send Pressure.");
+    });
+  }
+  </script>
+
+
+  <div style="width: 100%; text-align: center; padding-top: 40px;">
+    <a href="/controls.html">
+      <button style="background-color: rgb(2, 113, 249); color: #f6f5f5; font-size: 1cm; border-radius: 10px; padding: 20px 100px;">Back</button>
+    </a>
+  </div>
+
+  <div style="width: 100%; text-align: center; padding-top: 40px;">
+    <a href="/">
+      <button style="background-color: rgb(2, 113, 249); color: #f6f5f5; font-size: 1cm; border-radius: 10px; padding: 20px 100px;">Home</button>
+    </a>
+  </div>
+</body>
+</html>
 )=====";
 
 // Humidity Page
@@ -399,6 +483,7 @@ const char HTML_CONTENT_HUMIDITY[] PROGMEM = R"=====(
 )=====";
 
 
+
 // Save Page
 const char HTML_CONTENT_SAVE[] PROGMEM = R"=====(
 <!DOCTYPE html>
@@ -433,7 +518,7 @@ const char HTML_CONTENT_SAVE[] PROGMEM = R"=====(
 
 
     <div style="width: 100%; text-align: center; padding-top: 50px;">
-        <a href="https://downloadmoreram.com/download.html">
+        <a href="/404.html">
             <button style="
                 background-color: rgb(2, 113, 249);
                 color: #f6f5f5;
@@ -552,7 +637,43 @@ void handleSaveHumidity() {
   server.send(200, "text/plain", "Humidity received");
 }
 
+void handlePressure() {
+  server.send(200, "text/html", HTML_CONTENT_PRESSURE);
+}
 
+
+void handleSavePressure() {
+  if (server.hasArg("pressure")) {
+    String pressureStr = server.arg("pressure");
+    int pressure = pressureStr.toInt();
+
+    if (pressure >= 3 && pressure <= 40) {
+      // Set GPIO5 HIGH
+      digitalWrite(4, HIGH);
+
+      // to ensure transmission
+      delay(100);
+
+      // Send humidity to Serial and Serial2
+      Serial.println(String(pressure));
+      Serial2.println(String(pressure));
+
+      // to ensure transmission
+      delay(100);
+
+      // Set GPIO5 LOW
+      digitalWrite(5, LOW);
+    } else {
+      Serial.println("Invalid humidity value: " + String(pressure));
+      Serial2.println("Invalid humidity value: " + String(pressure));
+    }
+  } else {
+    Serial.println("No pressure arg found");
+    Serial2.println("No pressure arg found");
+  }
+
+  server.send(200, "text/plain", "Pressure received");
+}
 
 
 void setup() {
@@ -579,8 +700,11 @@ void setup() {
   server.on("/controls.html", handleControls);
   server.on("/lost.html", handleLost);
   server.on("/save.html", handleSave);
+
   server.on("/humidity.html", handleHumidity);
   server.on("/saveHumidity", HTTP_POST, handleSaveHumidity);
+  server.on("/pressure.html", handlePressure);
+  server.on("/savePressure", HTTP_POST, handleSavePressure);
 
   server.onNotFound(handleNotFound);
 
