@@ -649,7 +649,7 @@ void handleSavePressure() {
 
     if (pressure >= 3 && pressure <= 40) {
       // Set GPIO5 HIGH
-      digitalWrite(4, HIGH);
+      digitalWrite(5, HIGH);
 
       // to ensure transmission
       delay(100);
