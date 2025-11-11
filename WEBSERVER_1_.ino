@@ -753,4 +753,13 @@ void setup() {
 
 void loop() {
   server.handleClient();
+
+  // Echo Serial2 input to Serial0
+  if (Serial2.available()) {
+    String incoming = Serial2.readStringUntil('\n');
+    incoming.trim();  // Optional: clean up whitespace
+    Serial.print("RX2 received: ");
+    Serial.println(incoming);
+  }
 }
+
