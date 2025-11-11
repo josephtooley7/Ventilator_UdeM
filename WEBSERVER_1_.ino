@@ -633,8 +633,11 @@ void handleSaveHumidity() {
       delay(100);
 
       // Send humidity to Serial and Serial2
-      Serial.println(String(humidity));
-      Serial2.println(String(humidity));
+      char formatted[4];
+      sprintf(formatted, "%02d", humidity);
+      Serial.println(formatted);
+      Serial2.println(formatted);
+
 
       // to ensure transmission
       delay(100);
@@ -682,8 +685,11 @@ void handleSavePressure() {
       delay(100);
 
       // Send humidity to Serial and Serial2
-      Serial.println(String(pressure));
-      Serial2.println(String(pressure));
+      char formatted[4];
+      sprintf(formatted, "%02d", pressure);
+      Serial.println(formatted);
+      Serial2.println(formatted);
+
 
       // to ensure transmission
       delay(100);
