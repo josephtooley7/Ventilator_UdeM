@@ -503,9 +503,9 @@ const char HTML_CONTENT_INFORMATION[] PROGMEM = R"=====(
 <body style="background-color:rgb(100,100,100);color:white;text-align:center;">
   <h1>Card Responses</h1>
   <ul style="list-style:none;font-size:1.2em;padding:0;">
-    <li>Information X = %INFO_X%</li>
-    <li>Information Y = %INFO_Y%</li>
-    <li>Information Z = %INFO_Z%</li>
+    <li>Humidity = %INFO_X%</li>
+    <li>Pressure = %INFO_Y%</li>
+    <li>Hours spent = %INFO_Z%</li>
   </ul>
   <div style="padding-top:40px;">
     <a href="/"><button style="font-size:1cm;padding:20px 100px;background-color:rgb(2,113,249);color:#f6f5f5;border-radius:10px;">Back</button></a>
