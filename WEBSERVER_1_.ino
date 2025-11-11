@@ -5,6 +5,10 @@
 int lastHumidity = -1;
 int lastPressure = -1;
 
+const int cyclePins[] = {18, 19, 21};  // New pins for cycling
+String cycleResponses[3];             // Stores RX2 responses per pin
+
+
 
 const char WIFI_SSID[] = "BELL667";
 const char WIFI_PASSWORD[] = "your_password_here";
@@ -41,7 +45,7 @@ const char HTML_CONTENT_HOME[] PROGMEM = R"=====(
     }
   </style>
   <div style="width: 100%; text-align: center; padding-top: 50px;">
-    <a href="/temperature.html">
+    <a href="/information.html">
       <button style="background-color: rgb(2, 113, 249); color: #f6f5f5; font-size: 1cm; border-radius: 10px; padding: 20px 40px;">Information</button>
     </a>
   </div>
@@ -487,6 +491,28 @@ const char HTML_CONTENT_HUMIDITY[] PROGMEM = R"=====(
 </html>
 )=====";
 
+const char HTML_CONTENT_INFORMATION[] PROGMEM = R"=====( 
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="refresh" content="5">
+  <title>Information</title>
+</head>
+
+<body style="background-color:rgb(100,100,100);color:white;text-align:center;">
+  <h1>Card Responses</h1>
+  <ul style="list-style:none;font-size:1.2em;padding:0;">
+    <li>Information X = %INFO_X%</li>
+    <li>Information Y = %INFO_Y%</li>
+    <li>Information Z = %INFO_Z%</li>
+  </ul>
+  <div style="padding-top:40px;">
+    <a href="/"><button style="font-size:1cm;padding:20px 100px;background-color:rgb(2,113,249);color:#f6f5f5;border-radius:10px;">Back</button></a>
+  </div>
+</body>
+</html>
+)=====";
 
 
 // Save Page
@@ -555,6 +581,8 @@ const char HTML_CONTENT_SAVE[] PROGMEM = R"=====(
 </html>
 
 )=====";
+
+
 
 // Route Handlers
 void handleHome() {
@@ -667,6 +695,14 @@ void handlePressure() {
   server.send(200, "text/html", html);
 }
 
+void handleInformation() {
+  String html = HTML_CONTENT_INFORMATION;
+  html.replace("%INFO_X%", cycleResponses[0].length() ? cycleResponses[0] : "No data");
+  html.replace("%INFO_Y%", cycleResponses[1].length() ? cycleResponses[1] : "No data");
+  html.replace("%INFO_Z%", cycleResponses[2].length() ? cycleResponses[2] : "No data");
+  server.send(200, "text/html", html);
+}
+
 
 
 
@@ -714,6 +750,12 @@ void setup() {
   delay(1000);
   pinMode(LED_PIN, OUTPUT);
 
+  for (int i = 0; i < 3; i++) {
+  pinMode(cyclePins[i], OUTPUT);
+  digitalWrite(cyclePins[i], LOW);
+  }
+
+
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
   unsigned long start = millis();
   while (WiFi.status() != WL_CONNECTED && millis() - start < 10000) {
@@ -738,6 +780,8 @@ void setup() {
   server.on("/saveHumidity", HTTP_POST, handleSaveHumidity);
   server.on("/pressure.html", handlePressure);
   server.on("/savePressure", HTTP_POST, handleSavePressure);
+  server.on("/information.html", handleInformation);
+
 
   server.onNotFound(handleNotFound);
 
@@ -751,15 +795,37 @@ void setup() {
   server.begin();
 }
 
+unsigned long lastCycleTime = 0;
+const unsigned long cycleInterval = 1000;  // 1 second per pin
+int currentCycleIndex = 0;
+
 void loop() {
   server.handleClient();
 
-  // Echo Serial2 input to Serial0
-  if (Serial2.available()) {
-    String incoming = Serial2.readStringUntil('\n');
-    incoming.trim();  // Optional: clean up whitespace
-    Serial.print("RX2 received: ");
-    Serial.println(incoming);
+  if (millis() - lastCycleTime >= cycleInterval) {
+    // Reset all cycle pins LOW
+    for (int i = 0; i < 3; i++) {
+      digitalWrite(cyclePins[i], LOW);
+    }
+
+    // Activate current pin
+    int activePin = cyclePins[currentCycleIndex];
+    digitalWrite(activePin, HIGH);
+    delay(100);  // Allow signal to propagate
+
+    // Read from Serial2
+    if (Serial2.available()) {
+      String incoming = Serial2.readStringUntil('\n');
+      incoming.trim();
+      cycleResponses[currentCycleIndex] = incoming;
+      Serial.println("Cycle pin " + String(activePin) + " received: " + incoming);
+    }
+
+    // Deactivate pin
+    digitalWrite(activePin, LOW);
+
+    // Advance index
+    currentCycleIndex = (currentCycleIndex + 1) % 3;
+    lastCycleTime = millis();
   }
 }
-
