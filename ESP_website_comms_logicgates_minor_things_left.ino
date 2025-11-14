@@ -853,8 +853,10 @@ void loop() {
     if (Serial2.available()) {
       int incoming = Serial2.read();
       cycleResponses[currentCycleIndex] = String(incoming);
-      Serial.println(String(stateLabels[currentCycleIndex]) + String(incoming));
-                     " received: " + incoming);
+      Serial.println("State " + String(currentCycleIndex) + " (" +
+               stateLabels[currentCycleIndex] + ") received: " +
+               String(incoming));
+
     }
 
     // Reset pins LOW after capture
