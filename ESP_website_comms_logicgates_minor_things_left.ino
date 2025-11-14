@@ -23,6 +23,16 @@ const int numStates = sizeof(pinStates) / sizeof(pinStates[0]);
 int currentCycleIndex = 0;
 String cycleResponses[numStates];   // Now one response per state
 
+// Custom labels for each state
+const char* stateLabels[numStates] = {
+  "Battery percent = ",
+  "Pressure = ",
+  "Humidity = ",
+  "Temperature = ",
+  "Flow rate = ",
+  "Voltage = ",
+  "Current = "
+};
 
 
 
@@ -716,8 +726,10 @@ void handleInformation() {
   html += "<h1>Card Responses</h1><ul style='list-style:none;font-size:1.2em;padding:0;'>";
 
   for (int i = 0; i < numStates; i++) {
-    html += "<li>State " + String(i) + " = " + (cycleResponses[i].length() ? cycleResponses[i] : "No data") + "</li>";
-  }
+  html += "<li>" + String(stateLabels[i]) +
+          (cycleResponses[i].length() ? cycleResponses[i] : "No data") +
+          "</li>";
+}
 
   html += "</ul><div style='padding-top:40px;'><a href=\"/\"><button style=\"font-size:1cm;padding:20px 100px;background-color:rgb(2,113,249);color:#f6f5f5;border-radius:10px;\">Back</button></a></div></body></html>";
 
@@ -841,7 +853,7 @@ void loop() {
     if (Serial2.available()) {
       int incoming = Serial2.read();
       cycleResponses[currentCycleIndex] = String(incoming);
-      Serial.println("State " + String(currentCycleIndex) +
+      Serial.println(String(stateLabels[currentCycleIndex]) + String(incoming));
                      " received: " + incoming);
     }
 
