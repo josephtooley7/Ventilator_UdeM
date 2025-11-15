@@ -300,6 +300,22 @@ const char HTML_CONTENT_PRESSURE[] PROGMEM = R"=====(
       opacity: 1;
     }
   </style>
+<style>
+    .custom-input {
+      font-size: 1.2cm;
+      color: rgb(9, 25, 139);
+      background-color: rgb(200, 200, 200);
+      border: 2px solid #888;
+      border-radius: 10px;
+      padding: 20px;
+      width: 300px;
+    }
+    .custom-input::placeholder {
+      font-size: 1.2cm;
+      color: rgb(60, 60, 60);
+      opacity: 1;
+    }
+  </style>
 </head>
 <body style="background-color: rgb(100, 100, 100); margin: 0; width: 100%; text-align: center; padding-top: 50px;">
   <input type="number" id="pressure" class="custom-input" placeholder="Pressure" min="3" max="40">
