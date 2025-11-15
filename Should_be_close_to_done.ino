@@ -483,8 +483,8 @@ const char HTML_CONTENT_INFORMATION[] PROGMEM = R"=====(
 </head>
 
 <body style="background-color:rgb(100,100,100);color:white;text-align:center;">
-  <h1>Card Responses</h1>
-  <ul style="list-style:none;font-size:1.2em;padding:0;">
+  <h1>Information</h1>
+  <ul style="list-style:none;font-size:2cm;padding:12px;">
     <li>Humidity = %INFO_X%</li>
     <li>Pressure = %INFO_Y%</li>
     <li>Hours spent = %INFO_Z%</li>
@@ -680,13 +680,15 @@ void handlePressure() {
 
 void handleInformation() {
   String html = "<!DOCTYPE html><html><head><title>Information</title></head><body style='background-color:rgb(100,100,100);color:white;text-align:center;'>";
-  html += "<h1>Card Responses</h1><ul style='list-style:none;font-size:1.2em;padding:0;'>";
+  html += "<h1>Information</h1><ul style='list-style:none;font-size:1.2cm;padding:15px;'>";
 
   for (int i = 0; i < numStates; i++) {
-  html += "<li>" + String(stateLabels[i]) +
+  html += "<li style='margin:15px 0;'>" + String(stateLabels[i]) +
+          "<span style='font-size:1.5cm; color:yellow; font-weight:bold;'>" +
           (cycleResponses[i].length() ? cycleResponses[i] : "No data") +
-          "</li>";
+          "</span></li>";
 }
+
 
   html += "</ul><div style='padding-top:40px;'><a href=\"/\"><button style=\"font-size:1cm;padding:20px 100px;background-color:rgb(2,113,249);color:#f6f5f5;border-radius:10px;\">Back</button></a></div></body></html>";
 
