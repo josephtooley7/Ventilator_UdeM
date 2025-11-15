@@ -174,108 +174,11 @@ const char HTML_CONTENT_CONTROLS[] PROGMEM = R"=====(
   <meta charset="UTF-8">
   <title>Toggle Switch</title>
   <style>
-    .switch {
-      position: relative;
-      display: inline-block;
-      width: 60px;
-      height: 34px;
-    }
-
-    /* Hide default checkbox */
-    .switch input {
-      opacity: 0;
-      width: 0;
-      height: 0;
-    }
-
-    /* Slider */
-    .slider {
-      position: absolute;
-      cursor: pointer;
-      top: 0; left: 0;
-      right: 0; bottom: 0;
-      background-color: #ccc;
-      transition: 0.4s;
-      border-radius: 34px;
-    }
-
-    .slider::before {
-      position: absolute;
-      content: "";
-      height: 26px; width: 26px;
-      left: 4px; bottom: 4px;
-      background-color: white;
-      transition: 0.4s;
-      border-radius: 50%;
-    }
-
-    input:checked + .slider {
-      background-color: #4CAF50;
-    }
-
-    input:checked + .slider::before {
-      transform: translateX(26px);
-    }
+    
   </style>
 </head>
 <body style="background-color: rgb(100, 100, 100); margin: 0;">
 
-
-
-
-
-
-
-    <!-- Toggle Switch Component -->
-<label class="my-toggle-switch">
-  <input type="checkbox">
-  <span class="my-slider"></span>
-</label>
-
-<style>
-  .my-toggle-switch {
-    position: relative;
-    display: inline-block;
-    width: 60px;
-    height: 34px;
-  }
-
-  .my-toggle-switch input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-  }
-
-  .my-slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0; left: 0;
-    right: 0; bottom: 0;
-    background-color: #ccc;
-    transition: 0.4s;
-    border-radius: 34px;
-  }
-
-  .my-slider::before {
-    position: absolute;
-    content: "";
-    height: 26px; width: 26px;
-    left: 4px; bottom: 4px;
-    background-color: white;
-    transition: 0.4s;
-    border-radius: 50%;
-  }
-
-  .my-toggle-switch input:checked + .my-slider {
-    background-color: #4CAF50;
-  }
-
-  .my-toggle-switch input:checked + .my-slider::before {
-    transform: translateX(26px);
-  }
-</style>
-
-<!-- Toggle Switch Component -->
 
   
   <div style="width: 100%; text-align: center; padding-top: 40px;">
@@ -291,6 +194,18 @@ const char HTML_CONTENT_CONTROLS[] PROGMEM = R"=====(
         
         </a>
   </div>  
+
+<div style="width: 100%; text-align: center; padding-top: 40px;">
+        <a href="/humidity.html">
+           <button style="
+                background-color: rgb(2, 113, 249); 
+                color: #f6f5f5; 
+                font-size: 1cm; 
+                border-radius: 10px; 
+                padding: 20px 65px;">Modes</button>
+        
+        </a>
+    </div>  
 
   <div style="width: 100%; text-align: center; padding-top: 40px;">
         <a href="/">
