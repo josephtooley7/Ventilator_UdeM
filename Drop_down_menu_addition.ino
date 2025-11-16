@@ -273,7 +273,7 @@ const char HTML_CONTENT_MODES[] PROGMEM = R"=====(
     </a>
   </div>
   <div style="padding-top:40px;">
-      <a href="/.html">
+      <a href="/">
         <button style="background-color:rgb(2,113,249);color:#f6f5f5;font-size:1cm;border-radius:10px;padding:20px 100px;">Home</button>
       </a>
     </div>
