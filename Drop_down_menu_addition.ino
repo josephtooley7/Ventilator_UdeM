@@ -8,6 +8,8 @@ int lastHumidity = -1;
 
 int lastMinPressure = -1;
 int lastMaxPressure = -1;
+int lastCpapPressure = -1;
+
 
 int lastMode = -1;
 
@@ -446,6 +448,33 @@ const char HTML_CONTENT_PRESSURE[] PROGMEM = R"=====(
       .catch(err => alert("Failed to send Max Pressure."));
     }
   </script>
+    <!-- CPAP Pressure Section -->
+  <div class="section">
+    <input type="number" id="cpapPressure" class="custom-input"
+          placeholder="CPAP Pressure" min="3" max="40">
+    <div>
+      <button onclick="sendCpapPressure()" class="button">Save CPAP</button>
+    </div>
+  </div>
+
+  <script>
+    function sendCpapPressure() {
+      const val = validateInput("cpapPressure");
+      if (val === null) {
+        alert("Please enter a CPAP Pressure between 3 and 40.");
+        return;
+      }
+      fetch("/saveCpapPressure", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: "cpapPressure=" + encodeURIComponent(val)
+      })
+      .then(r => r.text())
+      .then(data => alert("CPAP Pressure sent: " + val))
+      .catch(err => alert("Failed to send CPAP Pressure."));
+    }
+  </script>
+
 
   <div style="padding-top:40px;">
     <a href="/controls.html">
@@ -745,8 +774,44 @@ void handlePressure() {
   if (lastMaxPressure >= 3 && lastMaxPressure <= 40) {
     html.replace("id=\"maxPressure\"", "id=\"maxPressure\" value=\"" + String(lastMaxPressure) + "\"");
   }
+  if (lastCpapPressure >= 3 && lastCpapPressure <= 40) {
+  html.replace("id=\"cpapPressure\"", "id=\"cpapPressure\" value=\"" + String(lastCpapPressure) + "\"");
+  }
 
   server.send(200, "text/html", html);
+}
+
+void handleSaveCpapPressure() {
+  if (server.hasArg("cpapPressure")) {
+    int val = server.arg("cpapPressure").toInt();
+    if (val >= 3 && val <= 40) {
+      lastCpapPressure = val;
+
+      // Set pins 4, 5, and 22 HIGH
+      digitalWrite(4, HIGH);
+      digitalWrite(5, HIGH);
+      digitalWrite(22, HIGH);
+
+      delay(100);
+
+      // Send value
+      Serial.println(val);
+      Serial2.println(val);
+
+      // Reset pins LOW
+      digitalWrite(4, LOW);
+      digitalWrite(5, LOW);
+      digitalWrite(22, LOW);
+    } else {
+      Serial.println(0);
+      Serial2.println(0);
+    }
+  } else {
+    Serial.println(0);
+    Serial2.println(0);
+  }
+
+  server.send(200, "text/plain", "CPAP Pressure received");
 }
 
 
@@ -757,7 +822,7 @@ void handleInformation() {
   html += "<li>Humidity Setting= " + String(lastHumidity >= 0 ? lastHumidity : 0) + "%</li>";
   html += "<li>Min Pressure = " + String(lastMinPressure >= 0 ? lastMinPressure : 0) + "</li>";
   html += "<li>Max Pressure = " + String(lastMaxPressure >= 0 ? lastMaxPressure : 0) + "</li>";
-
+  html += "<li>CPAP Pressure = " + String(lastCpapPressure >= 3 && lastCpapPressure <= 40 ? lastCpapPressure : 0) + "</li>";
   //html += "<li>Mode = " + String(lastMode >= 0 ? lastMode : 0) + "</li>";
   String modeDisplay = (lastMode >= 1 && lastMode <= 6) ? modeNames[lastMode] : "None";
   html += "<li>Mode = " + modeDisplay + "</li>";
@@ -918,6 +983,7 @@ void setup() {
 
   server.on("/saveMinPressure", HTTP_POST, handleSaveMinPressure);
   server.on("/saveMaxPressure", HTTP_POST, handleSaveMaxPressure);
+  server.on("/saveCpapPressure", HTTP_POST, handleSaveCpapPressure);
 
 
   server.onNotFound(handleNotFound);
