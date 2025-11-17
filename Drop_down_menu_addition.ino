@@ -1,10 +1,15 @@
 
+
 #include <WiFi.h>
 #include <WebServer.h>
 
 
 int lastHumidity = -1;
-int lastPressure = -1;
+
+int lastMinPressure = -1;
+int lastMaxPressure = -1;
+
+int lastMode = -1;
 
 const int cyclePins[] = {18, 19, 21};
 
@@ -34,6 +39,16 @@ const char* stateLabels[numStates] = {
   "empty value = "
 };
 
+//Names of different modes
+const char* modeNames[] = {
+  "None",   // index 0
+  "Cpap",   // index 1
+  "S Bipap",  // index 2
+  "T Bipap",
+  "S/T Bipap",
+  "PC Bipap",
+  "Bipap"
+};
 
 
 const char WIFI_SSID[] = "BELL667";
@@ -242,11 +257,11 @@ const char HTML_CONTENT_MODES[] PROGMEM = R"=====(
   <select id="modeSelect" style="font-size:1.2cm; padding:10px; border-radius:10px;">
     <!--Ajust the modes value here-->
     <option value="1">Cpap</option>
-    <option value="2">Bipap</option>
-    <option value="3">Mode 3</option>
-    <option value="4">Mode 4</option>
-    <option value="5">Mode 5</option>
-    <option value="6">Mode 6</option>
+    <option value="2">S Bipap</option>
+    <option value="3">T Bipap</option>
+    <option value="4">S/T Bipap</option>
+    <option value="5">PC Bipap</option>
+    <option value="6">Bipap</option>
   </select>
 
   <div style="padding-top:40px;">
@@ -273,10 +288,10 @@ const char HTML_CONTENT_MODES[] PROGMEM = R"=====(
     </a>
   </div>
   <div style="padding-top:40px;">
-      <a href="/">
-        <button style="background-color:rgb(2,113,249);color:#f6f5f5;font-size:1cm;border-radius:10px;padding:20px 100px;">Home</button>
-      </a>
-    </div>
+    <a href="/">
+      <button style="background-color:rgb(2,113,249);color:#f6f5f5;font-size:1cm;border-radius:10px;padding:20px 100px;">Home</button>
+    </a>
+  </div>
 </body>
 </html>
 
@@ -724,23 +739,38 @@ void handleSaveHumidity() {
 void handlePressure() {
   String html = HTML_CONTENT_PRESSURE;
 
-  if (lastPressure >= 3 && lastPressure <= 40) {
-    html.replace("id=\"pressure\"", "id=\"pressure\" value=\"" + String(lastPressure) + "\"");
-    //html.replace("</script>", "</script><p style='color:white;'>Last saved pressure: " + String(lastPressure) + "</p>");
+  if (lastMinPressure >= 3 && lastMinPressure <= 40) {
+    html.replace("id=\"minPressure\"", "id=\"minPressure\" value=\"" + String(lastMinPressure) + "\"");
+  }
+  if (lastMaxPressure >= 3 && lastMaxPressure <= 40) {
+    html.replace("id=\"maxPressure\"", "id=\"maxPressure\" value=\"" + String(lastMaxPressure) + "\"");
   }
 
   server.send(200, "text/html", html);
 }
 
+
 void handleInformation() {
   String html = "<!DOCTYPE html><html><head><title>Information</title></head><body style='background-color:rgb(100,100,100);color:white;text-align:center;'>";
   html += "<h1>Information</h1><ul style='list-style:none;font-size:1.2cm;padding:15px;'>";
+
+  html += "<li>Humidity Setting= " + String(lastHumidity >= 0 ? lastHumidity : 0) + "%</li>";
+  html += "<li>Min Pressure = " + String(lastMinPressure >= 0 ? lastMinPressure : 0) + "</li>";
+  html += "<li>Max Pressure = " + String(lastMaxPressure >= 0 ? lastMaxPressure : 0) + "</li>";
+
+  //html += "<li>Mode = " + String(lastMode >= 0 ? lastMode : 0) + "</li>";
+  String modeDisplay = (lastMode >= 1 && lastMode <= 6) ? modeNames[lastMode] : "None";
+  html += "<li>Mode = " + modeDisplay + "</li>";
+
 
   for (int i = 0; i < numStates; i++) {
   html += "<li style='margin:15px 0;'>" + String(stateLabels[i]) +
           "<span style='font-size:1.5cm; color:yellow; font-weight:bold;'>" +
           (cycleResponses[i].length() ? cycleResponses[i] : "No data") +
           "</span></li>";
+
+
+
 }
 
 
@@ -756,9 +786,8 @@ void handleInformation() {
 void handleSaveMinPressure() {
   if (server.hasArg("minPressure")) {
     int val = server.arg("minPressure").toInt();
-
     if (val >= 3 && val <= 40) {   // enforce valid range
-      lastPressure = val;
+      lastMinPressure = val;
 
       // Pin signaling
       digitalWrite(4, LOW);
@@ -792,9 +821,8 @@ void handleSaveMinPressure() {
 void handleSaveMaxPressure() {
   if (server.hasArg("maxPressure")) {
     int val = server.arg("maxPressure").toInt();
-
     if (val >= 3 && val <= 40) {   // <-- enforce valid range
-      lastPressure = val;
+      lastMaxPressure = val;
 
       // NEW behavior: set both pins HIGH
       digitalWrite(4, HIGH);
@@ -818,7 +846,7 @@ void handleSaveMaxPressure() {
   server.send(200, "text/plain", "Max Pressure received");
 }
 
-int lastMode = -1;
+
 #define MODE_PIN 22   // free pin chosen
 
 void handleSaveMode() {
