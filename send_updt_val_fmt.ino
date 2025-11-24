@@ -1096,7 +1096,7 @@ void handleSaveMode() {
 
 void handleSaveInspTime() {
   if (server.hasArg("inspTime")) {
-    int val = server.arg("inspTime").toInt();
+    int val = server.arg("inspTime").toFloat();
     if (val >= 0 && val <= 9.9) {
       lastInspTime = (int)(val*10);
 
@@ -1126,7 +1126,7 @@ void handleSaveInspTime() {
 
 void handleSaveExpTime() {
   if (server.hasArg("expTime")) {
-    int val = server.arg("expTime").toInt();
+    int val = server.arg("expTime").toFloat();
     if (val >= 0 && val <= 9.9) {
       lastExpTime = (int)(val*10);
 
