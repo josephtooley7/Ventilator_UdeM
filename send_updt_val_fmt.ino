@@ -1098,7 +1098,7 @@ void handleSaveInspTime() {
   if (server.hasArg("inspTime")) {
     int val = server.arg("inspTime").toInt();
     if (val >= 0 && val <= 9.9) {
-      lastInspTime = (val*10);
+      lastInspTime = (int)(val*10);
 
       // Set pins 4 and 22 HIGH briefly
       digitalWrite(4, HIGH);
@@ -1128,7 +1128,7 @@ void handleSaveExpTime() {
   if (server.hasArg("expTime")) {
     int val = server.arg("expTime").toInt();
     if (val >= 0 && val <= 9.9) {
-      lastExpTime = (val*10);
+      lastExpTime = (int)(val*10);
 
       // Set pins 5 and 22 HIGH briefly
       digitalWrite(5, HIGH);
