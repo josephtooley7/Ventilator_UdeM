@@ -1096,9 +1096,9 @@ void handleSaveMode() {
 
 void handleSaveInspTime() {
   if (server.hasArg("inspTime")) {
-    int val = server.arg("inspTime").toFloat();
+    float val = server.arg("inspTime").toFloat();
     if (val >= 0 && val <= 9.9) {
-      lastInspTime = (int)(val*10);
+      lastInspTime = (int)round(val*10);
 
       // Set pins 4 and 22 HIGH briefly
       digitalWrite(4, HIGH);
@@ -1126,9 +1126,9 @@ void handleSaveInspTime() {
 
 void handleSaveExpTime() {
   if (server.hasArg("expTime")) {
-    int val = server.arg("expTime").toFloat();
+    float val = server.arg("expTime").toFloat();
     if (val >= 0 && val <= 9.9) {
-      lastExpTime = (int)(val*10);
+      lastExpTime = (int)round(val*10);
 
       // Set pins 5 and 22 HIGH briefly
       digitalWrite(5, HIGH);
@@ -1146,7 +1146,7 @@ void handleSaveExpTime() {
       digitalWrite(5, LOW);
       digitalWrite(22, LOW);
     } else {
-      Serial2.println(0);
+      Serial2.println(00);
       Serial.println("Invalid Expiration Time");
     }
   }
