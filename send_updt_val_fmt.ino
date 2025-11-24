@@ -190,7 +190,7 @@ const char HTML_CONTENT_TIMES[] PROGMEM = R"=====(
   <!-- Inspiration Time -->
   <div class="section">
     <input type="number" id="inspTime" class="custom-input"
-           placeholder="Inspiration Time (s)" min="1" max="100">
+           placeholder="Inspiration Time (s)" min="0" max="9.9">
     <div>
       <button onclick="sendInspTime()" class="button">Save Inspiration</button>
     </div>
@@ -199,7 +199,7 @@ const char HTML_CONTENT_TIMES[] PROGMEM = R"=====(
   <!-- Expiration Time -->
   <div class="section">
     <input type="number" id="expTime" class="custom-input"
-           placeholder="Expiration Time (s)" min="1" max="100">
+           placeholder="Expiration Time (s)" min="0" max="9.9">
     <div>
       <button onclick="sendExpTime()" class="button">Save Expiration</button>
     </div>
@@ -209,7 +209,7 @@ const char HTML_CONTENT_TIMES[] PROGMEM = R"=====(
     function validateInput(id) {
       const el = document.getElementById(id);
       const val = parseInt(el.value);
-      if (isNaN(val) || val < 1 || val > 100) {
+      if (isNaN(val) || val < 0 || val > 9.9) {
         el.classList.add("invalid");
         return null;
       } else {
@@ -221,7 +221,7 @@ const char HTML_CONTENT_TIMES[] PROGMEM = R"=====(
     function sendInspTime() {
       const val = validateInput("inspTime");
       if (val === null) {
-        alert("Please enter Inspiration Time between 1 and 100 seconds.");
+        alert("Please enter Inspiration Time between 0 and 9.9 seconds.");
         return;
       }
       fetch("/saveInspTime", {
@@ -237,7 +237,7 @@ const char HTML_CONTENT_TIMES[] PROGMEM = R"=====(
     function sendExpTime() {
       const val = validateInput("expTime");
       if (val === null) {
-        alert("Please enter Expiration Time between 1 and 100 seconds.");
+        alert("Please enter Expiration Time between 0 and 9.9 seconds."); 
         return;
       }
       fetch("/saveExpTime", {
@@ -674,8 +674,8 @@ const char HTML_CONTENT_HUMIDITY[] PROGMEM = R"=====(
   <script>
   function sendHumidity() {
     const humidity = parseInt(document.getElementById("humidity").value);
-    if (isNaN(humidity) || humidity < 0 || humidity > 100) {
-      alert("Please enter a humidity value between 0 and 100.");
+    if (isNaN(humidity) || humidity < 0 || humidity > 95) {
+      alert("Please enter a humidity value between 0 and 95.");
       return;
     }
 
@@ -871,7 +871,7 @@ void handleSaveHumidity() {
     String humidityStr = server.arg("humidity");
     int humidity = humidityStr.toInt();
 
-    if (humidity >= 0 && humidity <= 100) {
+    if (humidity >= 0 && humidity <= 99) {
 
       lastHumidity = humidity;  // Save last value it
 
@@ -1097,8 +1097,8 @@ void handleSaveMode() {
 void handleSaveInspTime() {
   if (server.hasArg("inspTime")) {
     int val = server.arg("inspTime").toInt();
-    if (val >= 1 && val <= 100) {
-      lastInspTime = val;
+    if (val >= 0 && val <= 9.9) {
+      lastInspTime = (val*10);
 
       // Set pins 4 and 22 HIGH briefly
       digitalWrite(4, HIGH);
@@ -1122,11 +1122,13 @@ void handleSaveInspTime() {
   server.send(200, "text/plain", "Inspiration Time received");
 }
 
+
+
 void handleSaveExpTime() {
   if (server.hasArg("expTime")) {
     int val = server.arg("expTime").toInt();
-    if (val >= 1 && val <= 100) {
-      lastExpTime = val;
+    if (val >= 0 && val <= 9.9) {
+      lastExpTime = (val*10);
 
       // Set pins 5 and 22 HIGH briefly
       digitalWrite(5, HIGH);
