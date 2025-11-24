@@ -936,8 +936,11 @@ void handleSaveCpapPressure() {
       delay(100);
 
       // Send value
-      Serial.println(val);
-      Serial2.println(val);
+      char formatted[4];
+      sprintf(formatted, "%02d", cpapPressure);
+      Serial.println(formatted);
+      Serial2.println(formatted);
+
 
       // Reset pins LOW
       digitalWrite(4, LOW);
@@ -1005,8 +1008,10 @@ void handleSaveMinPressure() {
       delay(100);
 
       // Send only the number
-      Serial.println(val);
-      Serial2.println(val);
+      char formatted[4];
+      sprintf(formatted, "%02d", minPressure);
+      Serial.println(formatted);
+      Serial2.println(formatted);
 
       digitalWrite(4, LOW);
       digitalWrite(5, LOW);
@@ -1038,8 +1043,13 @@ void handleSaveMaxPressure() {
       digitalWrite(5, HIGH);
 
       delay(100);
-      Serial.println(val);
-      Serial2.println(val);
+
+      //Sends the Maximum pressure
+       // Send only the number
+      char formatted[4];
+      sprintf(formatted, "%02d", maxPressure);
+      Serial.println(formatted);
+      Serial2.println(formatted);
 
       digitalWrite(4, LOW);
       digitalWrite(5, LOW);
@@ -1068,8 +1078,10 @@ void handleSaveMode() {
     delay(100);
 
     // Send mode number via TX2
-    Serial2.println(val);
-    Serial.println(val);
+      char formatted[4];
+      sprintf(formatted, "%02d", mode);
+      Serial.println(formatted);
+      Serial2.println(formatted);
 
     digitalWrite(MODE_PIN, LOW);
   } else {
@@ -1094,8 +1106,10 @@ void handleSaveInspTime() {
       delay(100);
 
       // Send value via TX2
-      Serial2.println(val);
-      Serial.println("Inspiration Time sent: " + String(val));
+      char formatted[4];
+      sprintf(formatted, "%02d", inspTime);
+      Serial.println(formatted);
+      Serial2.println(formatted);
 
       // Reset pins LOW
       digitalWrite(4, LOW);
@@ -1120,9 +1134,12 @@ void handleSaveExpTime() {
       delay(100);
 
       // Send value via TX2
-      Serial2.println(val);
-      Serial.println("Expiration Time sent: " + String(val));
-
+      // Send value via TX2
+      char formatted[4];
+      sprintf(formatted, "%02d", expTime);
+      Serial.println(formatted);
+      Serial2.println(formatted);
+      
       // Reset pins LOW
       digitalWrite(5, LOW);
       digitalWrite(22, LOW);
