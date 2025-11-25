@@ -942,7 +942,7 @@ void handleInformation() {
 
   //html += "<li>Inspiration Time = " + String(lastInspTime >= 1 && lastInspTime <= 100 ? lastInspTime : 0) + " s</li>";
   //html += "<li>Expiration Time = " + String(lastExpTime >= 1 && lastExpTime <= 100 ? lastExpTime : 0) + " s</li>";
-  
+
   //adds the timing infromation
   html += "<li>Inspiration Time = " + String(lastInspTime / 10.0, 1) + " s</li>";
   html += "<li>Expiration Time = " + String(lastExpTime / 10.0, 1) + " s</li>";
@@ -1112,6 +1112,7 @@ void handleSaveInspTime() {
       lastInspTime = tenths;
 
       digitalWrite(4, HIGH);
+      digitalWrite(22, HIGH);
       delay(100);
 
       char formatted[4];
@@ -1120,6 +1121,7 @@ void handleSaveInspTime() {
       Serial2.println(formatted);
 
       digitalWrite(4, LOW);
+      digitalWrite(22, LOW);
     } else {
       Serial.println("00");
       Serial2.println("00");
@@ -1139,15 +1141,20 @@ void handleSaveExpTime() {
     if (tenths >= 1 && tenths <= 99) {
       lastExpTime = tenths;
 
+      //Multiplexing
       digitalWrite(5, HIGH);
+      digitalWrite(22, HIGH);
+
       delay(100);
 
       char formatted[4];
       sprintf(formatted, "%02d", tenths);
       Serial.println(formatted);
       Serial2.println(formatted);
+      
 
       digitalWrite(5, LOW);
+      digitalWrite(22, LOW);
     } else {
       Serial.println("00");
       Serial2.println("00");
