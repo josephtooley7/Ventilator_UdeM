@@ -1187,7 +1187,7 @@ void setup() {
   if (WiFi.status() == WL_CONNECTED) {
     Serial.println(WiFi.localIP());
   } else {
-    WiFi.softAP("Ventilator_NO1", "ciscut-3doxho-vybDam");
+    WiFi.softAP("Ventilator_NO1", "ciscut-3doxho-vybDam", 6); //<--Wifi name---password----chanel-->--<--for improved stabability change to another chanel ie 1-11, this is a quick fix-->---  
     Serial.println(WiFi.softAPIP());
   }
 
