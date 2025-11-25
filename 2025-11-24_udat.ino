@@ -826,12 +826,12 @@ void handleLed() {
       LED_state = HIGH;
       digitalWrite(LED_PIN, LED_state);
       Serial.println("hello");   // USB serial monitor
-      Serial2.println("hello");  // TX2 output
+      //Serial2.println(00);  // TX2 output (removed to avoid problems)
     } else {
       LED_state = LOW;
       digitalWrite(LED_PIN, LED_state);
       Serial.println("LED turned OFF");
-      Serial2.println("LED turned OFF");
+      //Serial2.println("LED turned OFF"); // removed to avoid problems
     }
   }
   String html = HTML_CONTENT_LED;
@@ -878,6 +878,7 @@ void handleSaveHumidity() {
       lastHumidity = humidity;  // Save last value it
 
       // Set GPIO4 HIGH
+      //Multiplex
       digitalWrite(4, HIGH);
       digitalWrite(5, LOW);
 
@@ -907,7 +908,7 @@ void handleSaveHumidity() {
 
   server.send(200, "text/plain", "Humidity received");
 }
-
+// Change these values to have the pressure at diferent limits >------------------------------------------------------------------------------------------>
 void handlePressure() {
   String html = HTML_CONTENT_PRESSURE;
 
@@ -926,7 +927,8 @@ void handlePressure() {
 
 
 
-//Infromation page upload <----------------------------------------------------------------->
+//Infromation page upload <------------------------------------------------------------------------------------------------------->
+
 void handleInformation() {
   String html = "<!DOCTYPE html><html><head><title>Information</title></head><body style='background-color:rgb(100,100,100);color:white;text-align:center;'>";
   html += "<h1>Information</h1><ul style='list-style:none;font-size:1.2cm;padding:15px;'>";
@@ -964,7 +966,7 @@ void handleInformation() {
   server.send(200, "text/html", html);
 }
 
-// Send the pressures <-------------------------------------------------------------->
+// Send the pressures <---------------------------------------------------------------------------------------->
 
 void handleSaveCpapPressure() {
   if (server.hasArg("cpapPressure")) {
@@ -973,6 +975,7 @@ void handleSaveCpapPressure() {
       lastCpapPressure = val;
 
       // Set pins 4, 5, and 22 HIGH
+      //Multiplex
       digitalWrite(4, HIGH);
       digitalWrite(5, HIGH);
       digitalWrite(22, HIGH);
@@ -1003,7 +1006,7 @@ void handleSaveCpapPressure() {
 }
 
 
-
+//the minimum pressure settin-------------------
 void handleSaveMinPressure() {
   if (server.hasArg("minPressure")) {
     int val = server.arg("minPressure").toInt();
@@ -1011,6 +1014,7 @@ void handleSaveMinPressure() {
       lastMinPressure = val;
 
       // Pin signaling
+      //Multiplex
       digitalWrite(4, LOW);
       digitalWrite(5, HIGH);
 
@@ -1047,7 +1051,8 @@ void handleSaveMaxPressure() {
     if (val >= 3 && val <= 40) {   // <-- enforce valid range
       lastMaxPressure = val;
 
-      // NEW behavior: set both pins HIGH
+      // set both pins HIGH
+      //Multiplex
       digitalWrite(4, HIGH);
       digitalWrite(5, HIGH);
 
@@ -1083,6 +1088,7 @@ void handleSaveMode() {
     lastMode = val;
 
     // Set MODE_PIN HIGH briefly
+    //Multiplex , mode pin = 22
     digitalWrite(MODE_PIN, HIGH);
     delay(100);
 
@@ -1111,6 +1117,7 @@ void handleSaveInspTime() {
     if (tenths >= 1 && tenths <= 99) { //prevents other numbers being sent
       lastInspTime = tenths;
 
+      //Multiplex
       digitalWrite(4, HIGH);
       digitalWrite(22, HIGH);
       delay(100);
@@ -1142,6 +1149,7 @@ void handleSaveExpTime() {
       lastExpTime = tenths;
 
       //Multiplexing
+      //Multiplex
       digitalWrite(5, HIGH);
       digitalWrite(22, HIGH);
 
@@ -1191,8 +1199,11 @@ void setup() {
     Serial.println(WiFi.softAPIP());
   }
 
+  //Multiplex
   pinMode(MODE_PIN, OUTPUT);
   digitalWrite(MODE_PIN, LOW);
+
+  //Important, all servers on, don't add too many!
 
   server.on("/modes.html", [](){ server.send(200, "text/html", HTML_CONTENT_MODES); });
   server.on("/saveMode", HTTP_POST, handleSaveMode);
@@ -1222,6 +1233,7 @@ void setup() {
 
   server.onNotFound(handleNotFound);
 
+  //makes these pins the sending pins for multiplexing, plus pin <22>
   pinMode(4, OUTPUT);
   pinMode(5, OUTPUT);
 
