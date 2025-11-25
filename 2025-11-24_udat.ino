@@ -16,6 +16,7 @@ int lastExpTime = -1;
 
 int lastMode = -1;
 
+//Multiplex
 const int cyclePins[] = {18, 19, 21};
 
 // Define all 7 non-zero combinations of 3 pins
