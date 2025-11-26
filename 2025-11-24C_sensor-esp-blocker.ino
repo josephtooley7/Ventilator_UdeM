@@ -1133,6 +1133,7 @@ void handleSaveInspTime() {
     if (tenths >= 1 && tenths <= 99) { //prevents other numbers being sent
       lastInspTime = tenths;
 
+      //Multiplex
       digitalWrite(4, HIGH);
       digitalWrite(22, HIGH);
       digitalWrite(5, LOW); 
