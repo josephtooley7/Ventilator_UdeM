@@ -879,10 +879,12 @@ void handleSaveHumidity() {
 
       // Set GPIO4 HIGH
       //Multiplex
+      digitalWrite(25, HIGH); //this one tells the sensor-esp to stop for a bit
+      delay(100);
       digitalWrite(4, HIGH);
       digitalWrite(5, LOW);
       digitalWrite(22, LOW);
-      digitalWrite(25, HIGH); //this one tells the sensor-esp to stop for a bit
+      
 
       // to ensure transmission
       delay(100);
@@ -978,10 +980,12 @@ void handleSaveCpapPressure() {
 
       // Set pins 4, 5, and 22 HIGH
       //Multiplex
+      digitalWrite(25, HIGH); //this one tells the sensor-esp to stop for a bit
+      delay(100);
       digitalWrite(4, HIGH);
       digitalWrite(5, HIGH);
       digitalWrite(22, HIGH);
-      digitalWrite(25, HIGH); //this one tells the sensor-esp to stop for a bit
+      
 
       delay(100);
 
@@ -1061,10 +1065,12 @@ void handleSaveMaxPressure() {
 
       // NEW behavior: set both pins HIGH
       //Multiplex
+      digitalWrite(25, HIGH); //this one tells the sensor-esp to stop for a bit
+      delay(100);
       digitalWrite(4, HIGH);
       digitalWrite(5, HIGH);
       digitalWrite(22, LOW); 
-      digitalWrite(25, HIGH); //this one tells the sensor-esp to stop for a bit
+      
 
       delay(100);
 
@@ -1134,10 +1140,12 @@ void handleSaveInspTime() {
       lastInspTime = tenths;
 
       //Multiplex
+      digitalWrite(25, HIGH); //this one tells the sensor-esp to stop for a bit
+      delay(100);
       digitalWrite(4, HIGH);
       digitalWrite(22, HIGH);
       digitalWrite(5, LOW); 
-      digitalWrite(25, HIGH); //this one tells the sensor-esp to stop for a bit
+      
       delay(100);
 
       char formatted[4];
@@ -1171,6 +1179,7 @@ void handleSaveExpTime() {
 
       //Multiplexing
       digitalWrite(25, HIGH); //this one tells the sensor esp to stop for a bit
+      delay(100);
       digitalWrite(5, HIGH);
       digitalWrite(22, HIGH);
       digitalWrite(4, LOW); 
@@ -1183,7 +1192,7 @@ void handleSaveExpTime() {
       Serial.println(formatted);
       Serial2.println(formatted);
       
-
+      //Multiplex
       digitalWrite(5, LOW);
       digitalWrite(4, LOW); 
       digitalWrite(22, LOW);
